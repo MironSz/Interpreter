@@ -14,12 +14,13 @@ transDecl (Decl t id) (State store env stateVals) = State store env2 (incMinLoc 
 
 transAss ::Stmt->State->State
 transAss (Ass ident item) (State store env stateVals) =
-  State store2 env2 stateVals2
 
 
 transAssToLoc ::Maybe Loc->Var->State->State
 transAssToLoc Nothing (State store env stateVals) -> State store env (throwError stateVals "Not declared")
-transAssToLoc (Just l) (State store env stateVals) ->
+transAssToLoc (Just l) v (State store env stateVals) -> State store2 env stateVals where store2 = insert l v store
+
+
 
 transStmt :: Stmt -> State->State
 transStmt stmt s = case stmt of

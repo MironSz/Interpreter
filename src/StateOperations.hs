@@ -31,10 +31,10 @@ getVar :: State ->Ident-> Maybe Var
 getVar (State s env err) id  = getVarFromLoc s l where l = getLoc env id
 
 incMinLoc :: [StateVals] -> [StateVals]
-incMinLoc (MinLoc i):xs -> (MinLoc (i+1)):xs
+incMinLoc (MinLoc i):xs = (MinLoc (i+1)):xs
 
 nextLoc :: [StateVals] -> Loc
-nextLoc (MinLoc loc):xs -> Loc loc
+nextLoc (MinLoc loc):xs = Loc loc
 
 throwError :: [StateVal]->String->[StateVal]
 throwError sv s = sv ++ [Error s]

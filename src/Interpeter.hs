@@ -71,14 +71,7 @@ transFType x = case x of
 transLambda :: Lambda -> Result
 transLambda x = case x of
   Lambda idents rblock -> failure x
-transItem :: Item -> Result
-transItem x = case x of
-  ItemExpr expr -> failure x
-  BracesItem item -> failure x
-  ItemIdent ident -> failure x
-  ItemLiteral trueinteger -> failure x
-  ItemString string -> failure x
-  ItemLambda lambda -> failure x
+
 transRefOrVal :: RefOrVal -> Result
 transRefOrVal x = case x of
   Ref ident -> failure x
