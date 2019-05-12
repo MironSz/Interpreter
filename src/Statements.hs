@@ -1,6 +1,6 @@
 module Statements where
-import StateOperations
 
+import AbsReBabel
 
 
 transStmtBlock :: Block->State->State
@@ -8,12 +8,11 @@ transBlock (Block stmts) s = unnest (foldl (nest s) stmts)
 
 
 transDecl :: Stmt->State->State
-transDecl (Decl t id) (State store env stateVals) = State store env2 (incMinLoc stateVals)
-  where env2 = addToEnv env (nextLoc stateVals) id t
+transDecl (Decl type_ ident) state = alloc state type_ ident
 
 
 transAss ::Stmt->State->State
-transAss (Ass ident item) (State store env stateVals) =
+transAss (Ass ident item) state = assign state ident (type_,)
 
 
 transAssToLoc ::Maybe Loc->Var->State->State
@@ -32,3 +31,8 @@ transStmt stmt s = case stmt of
   WhileStmt condition block -> failure x
   PrintStatement item -> failure x
   CallStmt call -> failure x
+
+
+transBlock :: Block -> Result
+transBlock x = case x of
+  Block stmts -> failure x

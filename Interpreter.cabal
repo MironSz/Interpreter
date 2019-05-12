@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e2a03ef9cdf658e9a9c9e27fcd52d8304933fcb772976734e57fb855aeeb5ca5
+-- hash: 4cbebc396b2be0d54c1838e57f30dde88257cfce676277b237b63de4c79a601f
 
 name:           Interpreter
 version:        0.1.0.0
@@ -20,7 +20,7 @@ build-type:     Simple
 extra-source-files:
     README.md
     ChangeLog.md
-
+source-repository
 source-repository head
   type: git
   location: https://github.com/Github username here/Interpreter
@@ -30,19 +30,20 @@ library
       AbsReBabel
       ErrM
       Interpeter
+      Items
       LexReBabel
       ParReBabel
       PrintReBabel
       SkelReBabel
       Statements
       StateOperations
-      TestReBabel
   other-modules:
       Paths_Interpreter
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , containers
   default-language: Haskell2010
 
 executable Interpreter-exe

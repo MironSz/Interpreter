@@ -12,6 +12,7 @@ failure x = Bad $ "Undefined case: " ++ show x
 transIdent :: Ident -> Result
 transIdent x = case x of
   Ident string -> failure x
+
 transProgram :: Program -> Result
 transProgram x = case x of
   Program stmts -> failure x
@@ -25,69 +26,69 @@ transTrueInteger :: TrueInteger -> Result
 transTrueInteger x = case x of
   Positive integer -> failure x
   Negative integer -> failure x
-transRawCondition :: RawCondition -> Result
-transRawCondition x = case x of
-  TrueCond ttrue -> failure x
-  FFalseCond ffalse -> failure x
-  BExpr condition1 boperator condition2 -> failure x
-  Equal item1 item2 -> failure x
-  Greater item1 item2 -> failure x
-  Smaller item1 item2 -> failure x
-  Negate condition -> failure x
-transCondition :: Condition -> Result
-transCondition x = case x of
-  Cond rawcondition -> failure x
+--transRawCondition :: RawCondition -> Result
+--transRawCondition x = case x of
+--  TrueCond ttrue -> failure x
+--  FFalseCond ffalse -> failure x
+--  BExpr condition1 boperator condition2 -> failure x
+--  Equal item1 item2 -> failure x
+--  Greater item1 item2 -> failure x
+--  Smaller item1 item2 -> failure x
+--  Negate condition -> failure x
+--transCondition :: Condition -> Result
+--transCondition x = case x of
+--  Cond rawcondition -> failure x
 transOperator :: Operator -> Result
 transOperator x = case x of
   DefineOperator type_1 ident type_2 lambda -> failure x
-transExpr :: Expr -> Result
-transExpr x = case x of
-  CallOperator item1 operator item2 -> failure x
-  ECall call -> failure x
-  MathExpr item1 mathop item2 -> failure x
-transStmt :: Stmt -> Result
-transStmt x = case x of
-  Empty -> failure x
-  BlockStatement block -> failure x
-  Decl type_ ident -> failure x
-  Ass ident item -> failure x
-  IfStmt condition block1 block2 -> failure x
-  WhileStmt condition block -> failure x
-  PrintStatement item -> failure x
-  CallStmt call -> failure x
-transBlock :: Block -> Result
-transBlock x = case x of
-  Block stmts -> failure x
-transRBlock :: RBlock -> Result
-transRBlock x = case x of
-  ReturnBlock stmts rstmt -> failure x
-transRStmt :: RStmt -> Result
-transRStmt x = case x of
-  RBlockStatement rblock -> failure x
-  Return item -> failure x
-  VoidReturn -> failure x
-  RIfStmt condition rblock1 rblock2 -> failure x
-transType :: Type -> Result
-transType x = case x of
-  VoidT -> failure x
-  IntT -> failure x
-  BoolT -> failure x
-  StringT -> failure x
-  FunctionT ftype -> failure x
-transFType :: FType -> Result
-transFType x = case x of
-  Function types type_ -> failure x
-transLambda :: Lambda -> Result
-transLambda x = case x of
-  Lambda idents rblock -> failure x
-transItem :: Item -> Result
-transItem x = case x of
-  ItemExpr expr -> failure x
-  BracesItem item -> failure x
-  ItemIdent ident -> failure x
-  ItemLiteral trueinteger -> failure x
-  ItemString string -> failure x
-  ItemLambda lambda -> failure x
+--transExpr :: Expr -> Result
+--transExpr x = case x of
+--  CallOperator item1 operator item2 -> failure x
+--  ECall call -> failure x
+--  MathExpr item1 mathop item2 -> failure x
+--transStmt :: Stmt -> Result
+--transStmt x = case x of
+--  Empty -> failure x
+--  BlockStatement block -> failure x
+--  Decl type_ ident -> failure x
+--  Ass ident item -> failure x
+--  IfStmt condition block1 block2 -> failure x
+--  WhileStmt condition block -> failure x
+--  PrintStatement item -> failure x
+--  CallStmt call -> failure x
+--transBlock :: Block -> Result
+--transBlock x = case x of
+--  Block stmts -> failure x
+--transRBlock :: RBlock -> Result
+--transRBlock x = case x of
+--  ReturnBlock stmts rstmt -> failure x
+--transRStmt :: RStmt -> Result
+--transRStmt x = case x of
+--  RBlockStatement rblock -> failure x
+--  Return item -> failure x
+--  VoidReturn -> failure x
+--  RIfStmt condition rblock1 rblock2 -> failure x
+--transType :: Type -> Result
+--transType x = case x of
+--  VoidT -> failure x
+--  IntT -> failure x
+--  BoolT -> failure x
+--  StringT -> failure x
+--  FunctionT ftype -> failure x
+--transFType :: FType -> Result
+--transFType x = case x of
+--  Function types type_ -> failure x
+--transLambda :: Lambda -> Result
+--transLambda x = case x of
+--  Lambda idents rblock -> failure x
+--transItem :: Item -> Result
+--transItem x = case x of
+--  ItemExpr expr -> failure x
+--  BracesItem item -> failure x
+--  ItemIdent ident -> failure x
+--  ItemLiteral trueinteger -> failure x
+--  ItemString string -> failure x
+--  ItemLambda lambda -> failure x
 transRefOrVal :: RefOrVal -> Result
 transRefOrVal x = case x of
   Ref ident -> failure x

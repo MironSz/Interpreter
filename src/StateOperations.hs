@@ -1,44 +1,126 @@
 module StateOperations where
 
+import Data.Map
+import AbsReBabel
+import Data.Maybe (fromJust, isJust)
 
-type Loc  = Int
-data Env = Env Map Ident (Loc,Type) | NestedEnv Env Env
-type Store =  Map Loc Var
+type Loc  =  Int
 
-data Var = Int Int | Bool Bool |  String String | FType FType
+data Var = Int Int
+	| Bool Bool
+	| String String
+	| FType (Store,[Var])->(Store,Var)
+	| Placeholder
 
-data State = State Store Env [StateVal]
+type State = Map String StateElem
 
-data StateVal = Error String | MinLoc Int
+type AEnv a = Map Ident a
+
+data StateElem = Store (Map Loc Var)
+  | Env [AEnv Loc]
+  | TEnv [AEnv Type]
+  | Error String
+  | MinLoc Loc
+
+
+envS::String
+envS = "env"
+
+tenvS::String
+tenvS = "tenv"
+
+storeS::String
+storeS = "store"
+
+errorS::String
+errorS = "error"
+
+minLocS::String
+minLocS = "minLoc"
 
 
 emptyState :: State
-emptyState = State empty  (Env empty)  [0]
+emptyState =
+  insert storeS (Store empty)
+  (insert tenvS (TEnv  [empty])
+  (insert envS (Env [empty])
+  (insert minLocS (MinLoc  0)  empty)))
+
+get::String->State->StateElem
+get s state = fromJust (Data.Map.lookup s state)
+
+getEnv :: State->[AEnv Loc]
+getEnv s = case get envS s of
+  Env xs -> xs
+getTEnv :: State->[AEnv Type]
+getTEnv s = case get tenvS s of
+  TEnv xs -> xs
 
 nest :: State->State
-nest (State store env stateVals) = State store (NestedEnv (Env empty) env)  stateVals
+nest  state =  insert tenvS nestedTEnv (insert envS nestedEnv state) where
+  nestedEnv = Env (empty:(getEnv state))
+  nestedTEnv = TEnv (empty:(getTEnv state))
+
+unnestEnv :: StateElem->StateElem
+unnestEnv (Env (x:xs)) = (Env xs)
+unnestEnv (TEnv (x:xs)) = (TEnv xs)
+
 
 unnest :: State -> State
-unnest (State s (NestedEnv e1 e2) stateVals) = State s e2 stateVals
+unnest state = insert envS oldEnv (insert tenvS oldTEnv state) where
+  oldEnv = unnestEnv (get envS state)
+  oldTEnv = unnestEnv (get tenvS state)
 
-getLoc :: Env->Ident->Maybe (Loc,Type)
-getLoc (Env m)  id = lookup id m
+getLoc :: StateElem->Ident->Maybe Loc
+getLoc (Env (e:es)) id = case Data.Map.lookup id e of
+  Just l -> Just l
+  Nothing -> getLoc (Env es) id
+getLoc (Env []) id = Nothing
 
-getVarFromLoc :: Store->Maybe Loc ->Maybe (Var,Type)
-getVarFromLoc s (Just (l,t)) = ((lookup l s),t)
+getType :: StateElem ->Ident ->Maybe Type
+getType (TEnv (e:es)) id = case Data.Map.lookup id e of
+  Just l -> Just l
+  Nothing -> getType (TEnv es) id
+getType (TEnv []) id = Nothing
+
+throwError ::State->String->State
+throwError state s =  state
+
+getVarFromLoc :: StateElem->Maybe Loc ->Maybe Var
+getVarFromLoc (Store s) (Just l) = Data.Map.lookup l s
+getVarFromLoc _ _ = Nothing
 
 getVar :: State ->Ident-> Maybe Var
-getVar (State s env err) id  = getVarFromLoc s l where l = getLoc env id
+getVar store id = getVarFromLoc (get storeS store) (getLoc (get envS store) id)
 
-incMinLoc :: [StateVals] -> [StateVals]
-incMinLoc (MinLoc i):xs = (MinLoc (i+1)):xs
+getNextLoc ::State->(State,Loc)
+getNextLoc state = (insert minLocS (MinLoc (nextLoc+1)) state,nextLoc) where MinLoc nextLoc = get minLocS state
 
-nextLoc :: [StateVals] -> Loc
-nextLoc (MinLoc loc):xs = Loc loc
+addToEnv :: State->Ident->State
+addToEnv state id = insert envS (Env (insert id loc env:envs)) state2 where
+  Env (env:envs) = get envS state
+  ( state2 , loc) = getNextLoc state
 
-throwError :: [StateVal]->String->[StateVal]
-throwError sv s = sv ++ [Error s]
+addToTEnv :: State->Ident->Type->State
+addToTEnv state id type_ = insert tenvS newTEnv state where
+  newTEnv = TEnv (insert id type_ oldTenv:tenvs)
+    where
+      TEnv (oldTenv:tenvs) = get tenvS state
 
+alloc :: State->Type->Ident->State
+alloc state type_ id = addToTEnv (addToEnv state id ) id type_
 
-addToEnv :: Env->Loc->Ident ->Type->Env
-addToEnv (Env m) loc ident t = insert ident (loc,t)
+assign :: State->Ident->(Type,Var)->State
+assign state id (type_, var) =
+  if type_2 /= Just type_ && (isJust type_2)
+    then
+      throwError state "Wrong type"
+    else
+      case loc of
+        Just l -> insert storeS (Store (insert l var store)) state
+        Nothing -> throwError state "Nor defined"
+  where
+    Store store = get storeS state
+    loc = getLoc (get envS state) id
+    type_2 = getType (get tenvS state) id
+
