@@ -1,0 +1,33 @@
+int zmienna1;
+int zmienna2;
+int zmienna3;
+function (int)->(int) f1;
+function (int)->(int) f2;
+function (int)->(int) f3;
+
+{
+  zmienna1 = 5;
+  zmienna1 = 3;
+} ;
+f1 = lambda x -> { return x  };
+
+if (zmienna1 > 5)
+  {zmienna1=2;}
+else
+  {zmienna1=3;};
+
+f2 = lambda x -> {x=0; return 5 };
+call f2  val zmienna1 ; //To nie modyfikuje wartości zmienna1.
+call f2  ref zmienna1 ; //To już tak.
+
+zmienna1 = 10;
+zmienna1 =  zmienna1 - 1;
+zmienna1 =  (zmienna1) - (1);
+zmienna1 =  ((zmienna1) - (1));
+zmienna1 =  (zmienna1 - 1);
+while ((false) neither (zmienna1 == 0))
+{
+  shout zmienna1;
+  call (lambda x -> {x=x-1; done}) ref zmienna1;
+};
+//shout "Hello JPP";

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="ghc-prim-0.5.3">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../.cache/intellij-haskell/lib/Interpreter/ghc-prim-0.5.3" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../.cache/intellij-haskell/lib/Interpreter/ghc-prim-0.5.3" />
+    </SOURCES>
+  </library>
+</component>

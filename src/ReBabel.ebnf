@@ -1,0 +1,79 @@
+Program. Program ::= [Stmt] ;
+FFalse. FFalse ::= "false" ;
+TTrue. TTrue ::= "true" ;
+
+Positive. TrueInteger ::= Integer;
+Negative. TrueInteger ::= "-" Integer ;
+TrueCond. RawCondition ::= TTrue ;
+FFalseCond. RawCondition ::= FFalse ;
+
+Cond. Condition ::=  "(" RawCondition ")" ;
+BExpr. RawCondition ::= Condition BOperator Condition ;
+Equal. RawCondition ::=  Item "==" Item ;
+Greater. RawCondition ::=  Item ">" Item ;
+Smaller. RawCondition ::=  Item "<" Item ;
+Negate. RawCondition ::= "not" Condition ;
+
+DefineOperator. Operator ::= "(" Type ")" Ident "(" Type ")" "=" Lambda ;
+CallOperator. Expr ::= Item Operator Item ;
+
+separator Stmt ";" ;
+Empty. Stmt ::= ";" ;
+Block. Block ::= "{" [Stmt] "}" ;
+
+ReturnBlock. RBlock ::= "{" [Stmt]  RStmt "}" ;
+RBlockStatement. RStmt ::= RBlock;
+BlockStatement. Stmt ::= Block ;
+Decl. Stmt ::= Type Ident ;
+Ass. Stmt ::= Ident "=" Item ;
+IfStmt. Stmt ::= "if" Condition Block "else" Block ;
+WhileStmt. Stmt ::= "while" Condition Block ;
+PrintStatement. Stmt ::= "shout" Item;
+CallStmt. Stmt ::= Call ;
+
+
+
+Return. RStmt ::= "return" Item ;
+VoidReturn. RStmt ::= "done";
+
+RIfStmt. RStmt ::= "if" Condition RBlock "else" RBlock ;
+
+VoidT. Type ::= "void" ;
+IntT. Type ::= "int";
+BoolT. Type ::= "bool" ;
+StringT. Type ::= "string";
+FunctionT. Type ::= FType;
+separator nonempty Type "," ;
+Function. FType ::= "function" "(" [Type] ")" "->" "(" Type ")" ;
+separator nonempty Ident "," ;
+separator nonempty Item "," ;
+
+Lambda. Lambda ::= "lambda" [Ident] "->" RBlock;
+
+ItemExpr. Item ::= Expr ;
+BracesItem. Item ::= "(" Item")";
+ItemIdent. Item ::= Ident ;
+ItemLiteral. Item ::= TrueInteger;
+ItemString. Item ::= String;
+ItemLambda. Item ::= Lambda;
+
+Ref. RefOrVal ::= "ref" Ident ;
+Val. RefOrVal ::= "val" Item ;
+separator RefOrVal "," ;
+Call. Call ::="call" Item [RefOrVal] ;
+ECall. Expr ::= Call ;
+MathExpr. Expr ::= Item MathOp Item ;
+
+And. BOperator ::= "and";
+Or. BOperator ::= "or";
+Neither. BOperator ::= "neither";
+Xor. BOperator ::= "xor";
+
+Add. MathOp ::= "+";
+Sub. MathOp ::= "-";
+Mul. MathOp ::= "*";
+Div. MathOp ::= "/";
+
+comment    "#" ;
+comment    "//" ;
+comment    "/*" "*/" ;
