@@ -20,7 +20,7 @@ build-type:     Simple
 extra-source-files:
     README.md
     ChangeLog.md
-source-repository
+--source-repository
 source-repository head
   type: git
   location: https://github.com/Github username here/Interpreter

@@ -9,7 +9,8 @@ function (int)->(int) f3;
   zmienna1 = 5;
   zmienna1 = 3;
 } ;
-f1 = lambda x -> { return x  };
+
+    f1 = lambda x -> { if a return x  else f1 };
 
 if (zmienna1 > 5)
   {zmienna1=2;}

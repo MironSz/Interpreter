@@ -6,11 +6,11 @@ import Data.Maybe (fromJust, isJust)
 
 type Loc  =  Int
 
-data Var = Int Int
-	| Bool Bool
-	| String String
-	| FType (Store,[Var])->(Store,Var)
-	| Placeholder
+data Var = IntV Int
+  | BoolV Bool
+  | StringV String
+  | FVar (State->[Var]->(Type,Var,State))
+  | Placeholder
 
 type State = Map String StateElem
 
@@ -56,6 +56,11 @@ getTEnv :: State->[AEnv Type]
 getTEnv s = case get tenvS s of
   TEnv xs -> xs
 
+checkExistence :: State->Ident->State
+checkExistence state ident = case getLoc (get envS state) ident of
+  Just _ -> state
+  Nothing -> throwError state "Undefined "
+
 nest :: State->State
 nest  state =  insert tenvS nestedTEnv (insert envS nestedEnv state) where
   nestedEnv = Env (empty:(getEnv state))
@@ -83,6 +88,9 @@ getType (TEnv (e:es)) id = case Data.Map.lookup id e of
   Nothing -> getType (TEnv es) id
 getType (TEnv []) id = Nothing
 
+getTType ::State->Ident->Type
+getTType state ident = fromJust (getType (get tenvS state) ident)
+
 throwError ::State->String->State
 throwError state s =  state
 
@@ -93,8 +101,16 @@ getVarFromLoc _ _ = Nothing
 getVar :: State ->Ident-> Maybe Var
 getVar store id = getVarFromLoc (get storeS store) (getLoc (get envS store) id)
 
+getJustTypeVar :: State->Ident -> (Type,Var,State)
+getJustTypeVar state ident = (type_, var, state2) where
+  state2 = checkExistence state ident
+  (type_,var) = case getVar state ident of
+    Just var -> (getTType state ident, var)
+    Nothing  -> (Whatever,Placeholder)
+
 getNextLoc ::State->(State,Loc)
-getNextLoc state = (insert minLocS (MinLoc (nextLoc+1)) state,nextLoc) where MinLoc nextLoc = get minLocS state
+getNextLoc state = (insert minLocS (MinLoc (nextLoc+1)) state,nextLoc) where
+  MinLoc nextLoc = get minLocS state
 
 addToEnv :: State->Ident->State
 addToEnv state id = insert envS (Env (insert id loc env:envs)) state2 where
@@ -112,7 +128,7 @@ alloc state type_ id = addToTEnv (addToEnv state id ) id type_
 
 assign :: State->Ident->(Type,Var)->State
 assign state id (type_, var) =
-  if type_2 /= Just type_ && (isJust type_2)
+  if type_2 /= Just type_ && isJust type_2
     then
       throwError state "Wrong type"
     else

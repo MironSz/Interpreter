@@ -48,7 +48,10 @@ Function. FType ::= "function" "(" [Type] ")" "->" "(" Type ")" ;
 separator nonempty Ident "," ;
 separator nonempty Item "," ;
 
-Lambda. Lambda ::= "lambda" [Ident] "->" RBlock;
+
+TypeDecl. TypeDecl ::= Type Ident;
+separator nonempty TypeDecl "," ;
+Lambda. Lambda ::= "lambda" [TypeDecl] "->" Type RBlock;
 
 ItemExpr. Item ::= Expr ;
 BracesItem. Item ::= "(" Item")";

@@ -166,9 +166,14 @@ instance Print FType where
   prt i e = case e of
     Function types type_ -> prPrec i 0 (concatD [doc (showString "function"), doc (showString "("), prt 0 types, doc (showString ")"), doc (showString "->"), doc (showString "("), prt 0 type_, doc (showString ")")])
 
+instance Print TypeDecl where
+  prt i e = case e of
+    TypeDecl type_ id -> prPrec i 0 (concatD [prt 0 type_, prt 0 id])
+  prtList _ [x] = (concatD [prt 0 x])
+  prtList _ (x:xs) = (concatD [prt 0 x, doc (showString ","), prt 0 xs])
 instance Print Lambda where
   prt i e = case e of
-    Lambda ids rblock -> prPrec i 0 (concatD [doc (showString "lambda"), prt 0 ids, doc (showString "->"), prt 0 rblock])
+    Lambda typedecls type_ rblock -> prPrec i 0 (concatD [doc (showString "lambda"), prt 0 typedecls, doc (showString "->"), prt 0 type_, prt 0 rblock])
 
 instance Print Item where
   prt i e = case e of

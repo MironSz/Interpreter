@@ -100,7 +100,10 @@ All other symbols are terminals.
   |  |  **|**  | //Ident// ``,`` //[Ident]// 
   | //[Item]// | -> | //Item// 
   |  |  **|**  | //Item// ``,`` //[Item]// 
-  | //Lambda// | -> | ``lambda`` //[Ident]// ``->`` //RBlock// 
+  | //TypeDecl// | -> | //Type// //Ident// 
+  | //[TypeDecl]// | -> | //TypeDecl// 
+  |  |  **|**  | //TypeDecl// ``,`` //[TypeDecl]// 
+  | //Lambda// | -> | ``lambda`` //[TypeDecl]// ``->`` //Type// //RBlock// 
   | //Item// | -> | //Expr// 
   |  |  **|**  | ``(`` //Item// ``)`` 
   |  |  **|**  | //Ident// 

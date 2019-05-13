@@ -26,6 +26,8 @@ import ErrM
 %name pFType FType
 %name pListIdent ListIdent
 %name pListItem ListItem
+%name pTypeDecl TypeDecl
+%name pListTypeDecl ListTypeDecl
 %name pLambda Lambda
 %name pItem Item
 %name pRefOrVal RefOrVal
@@ -147,8 +149,13 @@ ListIdent :: { [Ident] }
 ListIdent : Ident { (:[]) $1 } | Ident ',' ListIdent { (:) $1 $3 }
 ListItem :: { [Item] }
 ListItem : Item { (:[]) $1 } | Item ',' ListItem { (:) $1 $3 }
+TypeDecl :: { TypeDecl }
+TypeDecl : Type Ident { AbsReBabel.TypeDecl $1 $2 }
+ListTypeDecl :: { [TypeDecl] }
+ListTypeDecl : TypeDecl { (:[]) $1 }
+             | TypeDecl ',' ListTypeDecl { (:) $1 $3 }
 Lambda :: { Lambda }
-Lambda : 'lambda' ListIdent '->' RBlock { AbsReBabel.Lambda $2 $4 }
+Lambda : 'lambda' ListTypeDecl '->' Type RBlock { AbsReBabel.Lambda $2 $4 $5 }
 Item :: { Item }
 Item : Expr { AbsReBabel.ItemExpr $1 }
      | '(' Item ')' { AbsReBabel.BracesItem $2 }
