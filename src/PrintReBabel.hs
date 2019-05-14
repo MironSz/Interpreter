@@ -159,13 +159,9 @@ instance Print Type where
     IntT -> prPrec i 0 (concatD [doc (showString "int")])
     BoolT -> prPrec i 0 (concatD [doc (showString "bool")])
     StringT -> prPrec i 0 (concatD [doc (showString "string")])
-    FunctionT ftype -> prPrec i 0 (concatD [prt 0 ftype])
+    FunctionT types type_ -> prPrec i 0 (concatD [doc (showString "function"), doc (showString "("), prt 0 types, doc (showString ")"), doc (showString "->"), doc (showString "("), prt 0 type_, doc (showString ")")])
   prtList _ [x] = (concatD [prt 0 x])
   prtList _ (x:xs) = (concatD [prt 0 x, doc (showString ","), prt 0 xs])
-instance Print FType where
-  prt i e = case e of
-    Function types type_ -> prPrec i 0 (concatD [doc (showString "function"), doc (showString "("), prt 0 types, doc (showString ")"), doc (showString "->"), doc (showString "("), prt 0 type_, doc (showString ")")])
-
 instance Print TypeDecl where
   prt i e = case e of
     TypeDecl type_ id -> prPrec i 0 (concatD [prt 0 type_, prt 0 id])

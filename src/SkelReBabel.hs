@@ -73,10 +73,7 @@ transType x = case x of
   IntT -> failure x
   BoolT -> failure x
   StringT -> failure x
-  FunctionT ftype -> failure x
-transFType :: FType -> Result
-transFType x = case x of
-  Function types type_ -> failure x
+  FunctionT types type_ -> failure x
 transTypeDecl :: TypeDecl -> Result
 transTypeDecl x = case x of
   TypeDecl type_ ident -> failure x

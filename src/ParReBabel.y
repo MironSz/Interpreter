@@ -23,7 +23,6 @@ import ErrM
 %name pRStmt RStmt
 %name pType Type
 %name pListType ListType
-%name pFType FType
 %name pListIdent ListIdent
 %name pListItem ListItem
 %name pTypeDecl TypeDecl
@@ -140,11 +139,9 @@ Type : 'void' { AbsReBabel.VoidT }
      | 'int' { AbsReBabel.IntT }
      | 'bool' { AbsReBabel.BoolT }
      | 'string' { AbsReBabel.StringT }
-     | FType { AbsReBabel.FunctionT $1 }
+     | 'function' '(' ListType ')' '->' '(' Type ')' { AbsReBabel.FunctionT $3 $7 }
 ListType :: { [Type] }
 ListType : Type { (:[]) $1 } | Type ',' ListType { (:) $1 $3 }
-FType :: { FType }
-FType : 'function' '(' ListType ')' '->' '(' Type ')' { AbsReBabel.Function $3 $7 }
 ListIdent :: { [Ident] }
 ListIdent : Ident { (:[]) $1 } | Ident ',' ListIdent { (:) $1 $3 }
 ListItem :: { [Item] }

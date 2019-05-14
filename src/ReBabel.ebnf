@@ -42,9 +42,9 @@ VoidT. Type ::= "void" ;
 IntT. Type ::= "int";
 BoolT. Type ::= "bool" ;
 StringT. Type ::= "string";
-FunctionT. Type ::= FType;
+FunctionT. Type ::= "function" "(" [Type] ")" "->" "(" Type ")" ;
 separator nonempty Type "," ;
-Function. FType ::= "function" "(" [Type] ")" "->" "(" Type ")" ;
+
 separator nonempty Ident "," ;
 separator nonempty Item "," ;
 

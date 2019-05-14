@@ -66,10 +66,7 @@ data RStmt
     | RIfStmt Condition RBlock RBlock
   deriving (Eq, Ord, Show, Read)
 
-data Type = VoidT | IntT | BoolT | StringT | FunctionT FType | Whatever
-  deriving (Eq, Ord, Show, Read)
-
-data FType = Function [Type] Type
+data Type = VoidT | IntT | BoolT | StringT | FunctionT [Type] Type
   deriving (Eq, Ord, Show, Read)
 
 data TypeDecl = TypeDecl Type Ident
