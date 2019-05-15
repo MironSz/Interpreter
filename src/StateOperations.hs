@@ -133,3 +133,6 @@ addTypeDeclToEnv state typeDecl = Prelude.foldl addTypeDecl state typeDecl where
 
 addLambdaDeclarations :: State->[(Type,Var)]->State
 addLambdaDeclarations s _ = s
+
+--performLambda::State->Var->[()]->(Type,Var,Lambda)
+--performLambda state (FVar (f,state2,typeDecl))

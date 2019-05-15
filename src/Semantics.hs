@@ -44,7 +44,8 @@ evRStmt (RIfStmt condition rblock1 rblock2) state = let (isTrue,state2) = evCond
 		evRStmt (RBlockStatement rblock2) state2
 
 evRBlock  :: RBlock->State->(Type,Var,State)
-evRBlock  stmts rstmt
+evRBlock  (ReturnBlock stmts rstmt) state  = evRStmt rstmt state2 where
+  state2 = foldl evStatementReversed state stmts
 
 evLambda :: Lambda -> State -> (Type,Var,State)
 evLambda (Lambda typeDecls result_type rblock) state = let types = (typesFromTypesDecl typeDecls) in
