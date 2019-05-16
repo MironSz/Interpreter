@@ -20,6 +20,9 @@ evStatement (IfStmt condition block1 block2) state =
         then evBlock block1 state2
         else evBlock block2 state2
 evStatement (BlockStatement block) state = evBlock block state
+evStatement (CallStmt call) state = state2
+  where
+    (_, _, state2) = evCallLambda call state
 
 evCondition :: Condition -> State -> (Bool, State)
 evCondition (Cond rawCondition) state = evRawCondition rawCondition state
@@ -54,6 +57,7 @@ evExpression (MathExpr item1 op item2) state =
    in let (type2, var2, state2) = evItem item2 state1
        in case (type1, type2) of
             (IntT, IntT) -> evMathOp op state2 var1 var2
+evExpression (ECall call) state = evCallLambda call state
 
 --evExpression ECall (Call item refOrVals) state =
 evMathOp :: MathOp -> State -> (Var -> Var -> (Type, Var, State))
@@ -91,7 +95,7 @@ evDefLambda (Lambda typeDecls result_type rblock) state =
   let types = (typesFromTypesDecl typeDecls)
    in (FunctionT types result_type, FVar (func, state, typeDecls), state)
   where
-    func state2 identVars = evRBlock rblock state2
+    func state2 = evRBlock rblock state2
 
 evCallLambda :: Call -> State -> (Type, Var, State)
 evCallLambda (Call item refOrVals) state =

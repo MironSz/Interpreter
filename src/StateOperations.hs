@@ -10,7 +10,7 @@ data Var
   = IntV Integer
   | BoolV Bool
   | StringV String
-  | FVar (State -> [(Type, Var)] -> (Type, Var, State), State, [TypeDecl])
+  | FVar (State -> (Type, Var, State), State, [TypeDecl])
   | Placeholder
 
 instance Show Var where

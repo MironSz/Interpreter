@@ -12,3 +12,4 @@ else
     {int zmienna4; zmienna3=zmienna2;};
 
 f1 = lambda int x-> int {return 1};
+zmienna2 = call f1 val zmienna1;
