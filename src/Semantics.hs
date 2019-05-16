@@ -28,31 +28,32 @@ evRawCondition :: RawCondition -> State -> (Bool, State)
 evRawCondition (TrueCond _) state = (True, state)
 evRawCondition (FFalseCond _) state = (False, state)
 evRawCondition (Negate condition) state = evCondition condition state
-evRawCondition (Equal item1 item2) =
+evRawCondition (Equal item1 item2) state = evCompare item1 item2 (==) state
+evRawCondition (Smaller item1 item2) state = evCompare item1 item2 (<) state
+evRawCondition (Greater item1 item2) state = evCompare item1 item2 (>) state
 
-evCompare :: Item->Item->(Var->Var->Bool)->State->(Bool,State)
+evCompare :: Item -> Item -> (Var -> Var -> Bool) -> State -> (Bool, State)
 evCompare item1 item2 f state =
-  let (type1,var1,state1) = evItem item1 state in
-    let (type2,var2,state2) = evItem item2 state1 in
-      (f  var1 var2, state2)
-
+  let (type1, var1, state1) = evItem item1 state
+   in let (type2, var2, state2) = evItem item2 state1
+       in (f var1 var2, state2)
 
 --evRawCondition (Equal item1 item2) state =
 evItem :: Item -> State -> (Type, Var, State)
 evItem (BracesItem item) state = evItem item state
-evItem (ItemLiteral (Positive i)) state = (IntT, IntV 1, state)
-evItem (ItemLiteral (Negative i)) state = (IntT, IntV (-1), state)
+evItem (ItemLiteral (Positive i)) state = (IntT, IntV i, state)
+evItem (ItemLiteral (Negative i)) state = (IntT, IntV (-i), state)
 evItem (ItemString string) state = (StringT, StringV string, state)
 evItem (ItemIdent ident) state = getVarAndType state ident
 evItem (ItemLambda lambda) state = evLambda lambda state
 evItem (ItemExpr expr) state = evExpression expr state
 
 evExpression :: Expr -> State -> (Type, Var, State)
-evExpression (MathExpr item1 op item2) state =let
+evExpression (MathExpr item1 op item2) state =
   let (type1, var1, state1) = evItem item1 state
    in let (type2, var2, state2) = evItem item2 state1
        in case (type1, type2) of
-            (IntT, IntT) -> (evMathOp op state2) var1 var2
+            (IntT, IntT) -> evMathOp op state2 var1 var2
 
 --evExpression ECall (Call item refOrVals) state =
 evMathOp :: MathOp -> State -> (Var -> Var -> (Type, Var, State))
@@ -65,7 +66,6 @@ evMathOp op state = f
             Add -> IntV (a + b)
             Sub -> IntV (a - b)
             Mul -> IntV (a * b)
-
 
 evBlock :: Block -> State -> State
 evBlock (Block stmts) state = unnest (foldl evStatementReversed (nest state) stmts)
@@ -89,6 +89,10 @@ evRBlock (ReturnBlock stmts rstmt) state = evRStmt rstmt state2
 evLambda :: Lambda -> State -> (Type, Var, State)
 evLambda (Lambda typeDecls result_type rblock) state =
   let types = (typesFromTypesDecl typeDecls)
-   in (FunctionT types result_type, FVar (func, state, typeDecls), state)
-  where
-    func state2 identVars = evRBlock rblock state2
+   in (FunctionT types result_type, FVar (func, addTypeDeclToEnv state typeDecls, typeDecls) , stateWithFunction)
+    where
+      func state2 identVars = evRBlock rblock state2
+
+evCallLambda:: Call->State->(Type,Var,State)
+evCallLambda (Call item refOrVals) state =
+  let (lambdaType,lambda,state2) = evItem item state in

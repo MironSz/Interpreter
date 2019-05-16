@@ -179,6 +179,7 @@ instance Print Item where
     ItemLiteral trueinteger -> prPrec i 0 (concatD [prt 0 trueinteger])
     ItemString str -> prPrec i 0 (concatD [prt 0 str])
     ItemLambda lambda -> prPrec i 0 (concatD [prt 0 lambda])
+    ThisFunctionLambda -> prPrec i 0 (concatD [doc (showString "this")])
   prtList _ [x] = (concatD [prt 0 x])
   prtList _ (x:xs) = (concatD [prt 0 x, doc (showString ","), prt 0 xs])
 instance Print RefOrVal where

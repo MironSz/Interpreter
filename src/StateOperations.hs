@@ -7,7 +7,7 @@ import Data.Maybe (fromJust, isJust)
 type Loc = Int
 
 data Var
-  = IntV Int
+  = IntV Integer
   | BoolV Bool
   | StringV String
   | FVar (State -> [(Type, Var)] -> (Type, Var, State), State, [TypeDecl])
@@ -19,12 +19,38 @@ instance Show Var where
   show Placeholder = "placeholder"
   show _ = "sth"
 
+instance Eq Var where
+  x == y =
+    case (x, y) of
+      (IntV i, IntV j) -> i == j
+      (BoolV i, BoolV j) -> i == j
+      (StringV i, StringV j) -> i == j
+      (Placeholder, Placeholder) -> True
+      (_, _) -> False
+
+instance Ord Var where
+  x `compare` y =
+    case (x, y) of
+      (IntV i, IntV j) -> i `compare` j
+      (BoolV i, BoolV j) -> i `compare` j
+      (StringV i, StringV j) -> i `compare` j
+
 data State
   = State (Map String StateElem)
   | ErrorState State
-  deriving Show
+
+instance Show State where
+  show state =
+    "store: " ++ show (Store (store state)) ++ "env: " ++ show (Env (env state)) ++ "minLoc: " ++ show (minLoc state)
 
 type AEnv a b = [Map a b]
+
+showAEnv ::
+     Show key
+  => Show val =>
+       AEnv key val -> String
+showAEnv (x:xs) = "\n" ++ show x ++ "\n------------\n" ++ showAEnv xs
+showAEnv [] = ""
 
 data StateElem
   = Store (AEnv Loc (Type, Var))
@@ -32,7 +58,14 @@ data StateElem
   | Error String
   | MinLoc Loc
   | ReturnType [Type]
-  deriving (Show)
+  | This Var
+
+instance Show StateElem where
+  show (Store env) = showAEnv env
+  show (Env env) = showAEnv env
+  show (Error str) = str
+  show (MinLoc loc) = show loc
+  show (ReturnType types) = show types
 
 --  | Output (IO Char)
 nestAEnv :: AEnv a b -> AEnv a b
@@ -144,7 +177,7 @@ getVarAndType state ident =
 nextLoc :: State -> (Loc, State)
 nextLoc (State state) = (loc, nextState)
   where
-    nextState = State (insert minLocS (MinLoc (minLoc (State state)+1)) state)
+    nextState = State (insert minLocS (MinLoc (minLoc (State state) + 1)) state)
     loc = minLoc (State state)
 
 alloc :: State -> Ident -> Type -> State
@@ -162,8 +195,15 @@ alloc (ErrorState state) _ _ = (ErrorState state)
 assign :: State -> Ident -> Type -> Var -> State
 assign (State state) ident type_ var =
   let loc = getJustLoc (State state) ident
-   in let newStore = Store (insertAEnv (store (State state)) loc (type_, var))
+   in let newStore = Store (rAssign (store (State state)) loc (type_, var))
        in State (insert storeS newStore state)
+
+--   in let newStore = Store (insertAEnv (store (State state)) loc (type_, var))
+rAssign :: AEnv Loc (Type, Var) -> Loc -> (Type, Var) -> AEnv Loc (Type, Var)
+rAssign (x:xs) loc (type_, var) =
+  case Data.Map.lookup loc x of
+    Just (type2, var2) -> (insert loc (type_, var) x) : xs
+    Nothing -> x : rAssign xs loc (type_, var)
 
 typesFromTypesDecl :: [TypeDecl] -> [Type]
 typesFromTypesDecl typeDecl = Prelude.map f typeDecl
@@ -175,7 +215,5 @@ addTypeDeclToEnv state typeDecl = Prelude.foldl addTypeDecl state typeDecl
   where
     addTypeDecl state2 (TypeDecl type_ ident) = alloc state ident type_
 
-addLambdaDeclarations :: State -> [(Type, Var)] -> State
-addLambdaDeclarations s _ = s
---performLambda::State->Var->[()]->(Type,Var,Lambda)
---performLambda state (FVar (f,state2,typeDecl))
+addCurrentLambda:: State->Lambda->State
+

@@ -88,6 +88,7 @@ transItem x = case x of
   ItemLiteral trueinteger -> failure x
   ItemString string -> failure x
   ItemLambda lambda -> failure x
+  ThisFunctionLambda -> failure x
 transRefOrVal :: RefOrVal -> Result
 transRefOrVal x = case x of
   Ref ident -> failure x

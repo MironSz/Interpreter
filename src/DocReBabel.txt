@@ -36,8 +36,8 @@ The reserved words used in ReBabel are the following:
   | ``else`` | ``false`` | ``function`` | ``if``
   | ``int`` | ``lambda`` | ``neither`` | ``not``
   | ``or`` | ``ref`` | ``return`` | ``shout``
-  | ``string`` | ``true`` | ``val`` | ``void``
-  | ``while`` | ``xor`` |  | 
+  | ``string`` | ``this`` | ``true`` | ``val``
+  | ``void`` | ``while`` | ``xor`` | 
 
 The symbols used in ReBabel are the following:
   | - | ( | ) | ==
@@ -109,6 +109,7 @@ All other symbols are terminals.
   |  |  **|**  | //TrueInteger// 
   |  |  **|**  | //String// 
   |  |  **|**  | //Lambda// 
+  |  |  **|**  | ``this`` 
   | //RefOrVal// | -> | ``ref`` //Ident// 
   |  |  **|**  | ``val`` //Item// 
   | //[RefOrVal]// | -> | **eps**

@@ -68,13 +68,14 @@ import ErrM
   'return' { PT _ (TS _ 28) }
   'shout' { PT _ (TS _ 29) }
   'string' { PT _ (TS _ 30) }
-  'true' { PT _ (TS _ 31) }
-  'val' { PT _ (TS _ 32) }
-  'void' { PT _ (TS _ 33) }
-  'while' { PT _ (TS _ 34) }
-  'xor' { PT _ (TS _ 35) }
-  '{' { PT _ (TS _ 36) }
-  '}' { PT _ (TS _ 37) }
+  'this' { PT _ (TS _ 31) }
+  'true' { PT _ (TS _ 32) }
+  'val' { PT _ (TS _ 33) }
+  'void' { PT _ (TS _ 34) }
+  'while' { PT _ (TS _ 35) }
+  'xor' { PT _ (TS _ 36) }
+  '{' { PT _ (TS _ 37) }
+  '}' { PT _ (TS _ 38) }
 
 L_integ  { PT _ (TI $$) }
 L_ident  { PT _ (TV $$) }
@@ -160,6 +161,7 @@ Item : Expr { AbsReBabel.ItemExpr $1 }
      | TrueInteger { AbsReBabel.ItemLiteral $1 }
      | String { AbsReBabel.ItemString $1 }
      | Lambda { AbsReBabel.ItemLambda $1 }
+     | 'this' { AbsReBabel.ThisFunctionLambda }
 RefOrVal :: { RefOrVal }
 RefOrVal : 'ref' Ident { AbsReBabel.Ref $2 }
          | 'val' Item { AbsReBabel.Val $2 }

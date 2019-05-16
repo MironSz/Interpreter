@@ -59,6 +59,7 @@ ItemIdent. Item ::= Ident ;
 ItemLiteral. Item ::= TrueInteger;
 ItemString. Item ::= String;
 ItemLambda. Item ::= Lambda;
+ThisFunctionLambda. Item ::= "this" ;
 
 Ref. RefOrVal ::= "ref" Ident ;
 Val. RefOrVal ::= "val" Item ;

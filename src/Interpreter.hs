@@ -20,6 +20,7 @@ main = do
       (file:_) -> readFile file
   case pProgram (myLexer input) of
     Ok program -> putStrLn (show (evProgram (program)))
+    Bad msg -> putStrLn msg
 --  case pProgram (myLexer input) of
 --    (Ok s) -> do
 --      analysis <- runExceptT $ check s

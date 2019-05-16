@@ -1,0 +1,21 @@
+1.  Zmienić parsowanie intów
+2.
+ W czasie deklaracji funkcji zamrażam środowisko i zapamiętuję je.
+ Podczas wywołania funkcji ładuje do tego środowiska zmienne z wywołania, niezależnie czy to ref czy val
+ Po wyliczeniu wyniku biorę z środowiska zmienne które były przekazane przez ref i
+    wpisuje je do środowiska z któregojest wywołana funkcja
+
+int a=1;
+
+f(x) = {
+    static i=1;
+    print(a);
+    a++;
+    g(y)={
+        y=5;
+     };
+    g( ref y);
+}
+a++
+call f(val zmienna);
+call f(ref inneZmienna);

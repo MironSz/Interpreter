@@ -25,10 +25,15 @@ data TrueInteger
 data RawCondition
   = TrueCond TTrue
   | FFalseCond FFalse
-  | BExpr Condition BOperator Condition
-  | Equal Item Item
-  | Greater Item Item
-  | Smaller Item Item
+  | BExpr Condition
+          BOperator
+          Condition
+  | Equal Item
+          Item
+  | Greater Item
+            Item
+  | Smaller Item
+            Item
   | Negate Condition
   deriving (Eq, Ord, Show, Read)
 
@@ -37,22 +42,34 @@ data Condition =
   deriving (Eq, Ord, Show, Read)
 
 data Operator =
-  DefineOperator Type Ident Type Lambda
+  DefineOperator Type
+                 Ident
+                 Type
+                 Lambda
   deriving (Eq, Ord, Show, Read)
 
 data Expr
-  = CallOperator Item Operator Item
+  = CallOperator Item
+                 Operator
+                 Item
   | ECall Call
-  | MathExpr Item MathOp Item
+  | MathExpr Item
+             MathOp
+             Item
   deriving (Eq, Ord, Show, Read)
 
 data Stmt
   = Empty
   | BlockStatement Block
-  | Decl Type Ident
-  | Ass Ident Item
-  | IfStmt Condition Block Block
-  | WhileStmt Condition Block
+  | Decl Type
+         Ident
+  | Ass Ident
+        Item
+  | IfStmt Condition
+           Block
+           Block
+  | WhileStmt Condition
+              Block
   | PrintStatement Item
   | CallStmt Call
   deriving (Eq, Ord, Show, Read)
@@ -62,14 +79,17 @@ data Block =
   deriving (Eq, Ord, Show, Read)
 
 data RBlock =
-  ReturnBlock [Stmt] RStmt
+  ReturnBlock [Stmt]
+              RStmt
   deriving (Eq, Ord, Show, Read)
 
 data RStmt
   = RBlockStatement RBlock
   | Return Item
   | VoidReturn
-  | RIfStmt Condition RBlock RBlock
+  | RIfStmt Condition
+            RBlock
+            RBlock
   deriving (Eq, Ord, Show, Read)
 
 data Type
@@ -77,15 +97,19 @@ data Type
   | IntT
   | BoolT
   | StringT
-  | FunctionT [Type] Type
+  | FunctionT [Type]
+              Type
   deriving (Eq, Ord, Show, Read)
 
 data TypeDecl =
-  TypeDecl Type Ident
+  TypeDecl Type
+           Ident
   deriving (Eq, Ord, Show, Read)
 
 data Lambda =
-  Lambda [TypeDecl] Type RBlock
+  Lambda [TypeDecl]
+         Type
+         RBlock
   deriving (Eq, Ord, Show, Read)
 
 data Item
@@ -95,6 +119,7 @@ data Item
   | ItemLiteral TrueInteger
   | ItemString String
   | ItemLambda Lambda
+  | ThisFunctionLambda
   deriving (Eq, Ord, Show, Read)
 
 data RefOrVal
@@ -103,7 +128,8 @@ data RefOrVal
   deriving (Eq, Ord, Show, Read)
 
 data Call =
-  Call Item [RefOrVal]
+  Call Item
+       [RefOrVal]
   deriving (Eq, Ord, Show, Read)
 
 data BOperator
