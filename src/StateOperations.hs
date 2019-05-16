@@ -209,11 +209,3 @@ typesFromTypesDecl :: [TypeDecl] -> [Type]
 typesFromTypesDecl typeDecl = Prelude.map f typeDecl
   where
     f (TypeDecl type_ ident) = type_
-
-addTypeDeclToEnv :: State -> [TypeDecl] -> State
-addTypeDeclToEnv state typeDecl = Prelude.foldl addTypeDecl state typeDecl
-  where
-    addTypeDecl state2 (TypeDecl type_ ident) = alloc state ident type_
-
-addCurrentLambda:: State->Lambda->State
-

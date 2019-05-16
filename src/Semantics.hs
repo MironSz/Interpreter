@@ -1,7 +1,7 @@
 module Semantics where
 
-import AbsReBabel
-import StateOperations
+import           AbsReBabel
+import           StateOperations
 
 evProgram :: Program -> State
 evProgram (Program stmts) = foldl evStatementReversed emptyState stmts
@@ -25,10 +25,10 @@ evCondition :: Condition -> State -> (Bool, State)
 evCondition (Cond rawCondition) state = evRawCondition rawCondition state
 
 evRawCondition :: RawCondition -> State -> (Bool, State)
-evRawCondition (TrueCond _) state = (True, state)
-evRawCondition (FFalseCond _) state = (False, state)
-evRawCondition (Negate condition) state = evCondition condition state
-evRawCondition (Equal item1 item2) state = evCompare item1 item2 (==) state
+evRawCondition (TrueCond _) state          = (True, state)
+evRawCondition (FFalseCond _) state        = (False, state)
+evRawCondition (Negate condition) state    = evCondition condition state
+evRawCondition (Equal item1 item2) state   = evCompare item1 item2 (==) state
 evRawCondition (Smaller item1 item2) state = evCompare item1 item2 (<) state
 evRawCondition (Greater item1 item2) state = evCompare item1 item2 (>) state
 
@@ -40,13 +40,13 @@ evCompare item1 item2 f state =
 
 --evRawCondition (Equal item1 item2) state =
 evItem :: Item -> State -> (Type, Var, State)
-evItem (BracesItem item) state = evItem item state
+evItem (BracesItem item) state          = evItem item state
 evItem (ItemLiteral (Positive i)) state = (IntT, IntV i, state)
 evItem (ItemLiteral (Negative i)) state = (IntT, IntV (-i), state)
-evItem (ItemString string) state = (StringT, StringV string, state)
-evItem (ItemIdent ident) state = getVarAndType state ident
-evItem (ItemLambda lambda) state = evLambda lambda state
-evItem (ItemExpr expr) state = evExpression expr state
+evItem (ItemString string) state        = (StringT, StringV string, state)
+evItem (ItemIdent ident) state          = getVarAndType state ident
+evItem (ItemLambda lambda) state        = evDefLambda lambda state
+evItem (ItemExpr expr) state            = evExpression expr state
 
 evExpression :: Expr -> State -> (Type, Var, State)
 evExpression (MathExpr item1 op item2) state =
@@ -86,13 +86,44 @@ evRBlock (ReturnBlock stmts rstmt) state = evRStmt rstmt state2
   where
     state2 = foldl evStatementReversed state stmts
 
-evLambda :: Lambda -> State -> (Type, Var, State)
-evLambda (Lambda typeDecls result_type rblock) state =
+evDefLambda :: Lambda -> State -> (Type, Var, State)
+evDefLambda (Lambda typeDecls result_type rblock) state =
   let types = (typesFromTypesDecl typeDecls)
-   in (FunctionT types result_type, FVar (func, addTypeDeclToEnv state typeDecls, typeDecls) , stateWithFunction)
-    where
-      func state2 identVars = evRBlock rblock state2
+   in (FunctionT types result_type, FVar (func, state, typeDecls), state)
+  where
+    func state2 identVars = evRBlock rblock state2
 
-evCallLambda:: Call->State->(Type,Var,State)
+evCallLambda :: Call -> State -> (Type, Var, State)
 evCallLambda (Call item refOrVals) state =
-  let (lambdaType,lambda,state2) = evItem item state in
+  let (lambdaType, lambda, state2) = evItem item state
+   in let lambdaState = loadLambdaVars state2 lambda refOrVals
+       in let lambdaState = addSelf lambdaState lambda
+           in let (resultType, resultVar, newLambdaState) = performLambda lambdaState lambda
+               in let (state, newLambdaState) = retrieveRef state newLambdaState refOrVals
+                   in (resultType, resultVar, newLambdaState)
+
+retrieveRef :: State -> State -> [RefOrVal] -> (State, State)
+retrieveRef s1 s2 _ = (s1, unnest s2)
+
+performLambda :: State -> Var -> (Type, Var, State)
+performLambda lambdaState (FVar (func, _, _)) = func lambdaState
+
+addSelf :: State -> Var -> State
+addSelf s _ = s
+
+addTypeDeclToEnv :: State -> [TypeDecl] -> State
+addTypeDeclToEnv state typeDecl = Prelude.foldl addTypeDecl state typeDecl
+  where
+    addTypeDecl state2 (TypeDecl type_ ident) = alloc state ident type_
+
+--Zwraca state z jakim ma być wywołana lambda
+loadLambdaVars :: State -> Var -> [RefOrVal] -> State
+loadLambdaVars globalState (FVar (func, lambdaState, typeDecl)) refOrVals =
+  let declaredState = addTypeDeclToEnv (nest lambdaState) typeDecl
+   in let identAndRefOrVal = zip typeDecl refOrVals
+       in foldl (addToLambda globalState) declaredState identAndRefOrVal
+
+addToLambda :: State -> State -> (TypeDecl, RefOrVal) -> State
+addToLambda globalState state (TypeDecl type_ ident, Val item) = assign state2 ident type_ val
+  where
+    (type_, val, state2) = evItem item globalState
