@@ -105,13 +105,20 @@ evCallLambda (Call item refOrVals) state =
        in let lambdaState2 = addSelf lambdaState lambda
            in let (resultType, resultVar, newLambdaState) = performLambda lambdaState2 lambda
                in let (state2, newLambdaState2) = retrieveRef state newLambdaState (zip refOrVals (typeDecl lambda))
-                   in (resultType, resultVar, state2)
+                   in case item of
+                        ItemIdent ident -> (resultType, resultVar, updateLambdaState state2 newLambdaState2 ident)
+                        _ -> (resultType, resultVar, state2)
+
+updateLambdaState :: State -> State -> Ident -> State
+updateLambdaState globalState lambdaState ident =
+  let (type_, FVar (func, oldLambdaState, types), globalState2) = getVarAndType globalState ident
+   in assign globalState2 ident type_ (FVar (func, lambdaState, types))
 
 typeDecl :: Var -> [TypeDecl]
 typeDecl (FVar (_, _, xs)) = xs
 
 retrieveRef :: State -> State -> [(RefOrVal, TypeDecl)] -> (State, State)
-retrieveRef s1 s2 = foldl retrieveSingleRef (s1, s2) retrieveSingleRef
+retrieveRef s1 s2 = foldl retrieveSingleRef (s1, s2)
 
 retrieveSingleRef :: (State, State) -> (RefOrVal, TypeDecl) -> (State, State)
 retrieveSingleRef (globalState, lambdaState) (Ref identInGlobal, TypeDecl _ identInLambda) =

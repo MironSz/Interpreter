@@ -8,9 +8,13 @@ zmienna2=1;
 
 f1 = lambda int x-> int {return 1};
 f2 = lambda int x-> void {
-    x = 100;
+    zmienna2 = zmienna2+1;
+    x = zmienna2;
     done
 };
+call f2 ref zmienna1;
+call f2 ref zmienna1;
+call f2 ref zmienna1;
 call f2 ref zmienna1;
 //zmienna1 =1;
 //zmienna2 = call f1 val zmienna1;
