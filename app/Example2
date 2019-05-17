@@ -1,20 +1,44 @@
 int zmienna1;
 int zmienna2;
+string s1;
 function (int)->(int) f1;
 function (int)->(void) f2;
+function (int,int)->(void) f3;
+function (function (int)->(int), int) ->(int) f4;
+function (function (int)->(int),int) -> (function (int)->(int)) f5;
+function (int,int)->(int) max;
 
-zmienna1=1;
-zmienna2=1;
+max = lambda int x, int y -> int { if (x>y) { return x} else {return y}};
 
-f1 = lambda int x-> int {return 1};
+zmienna1=10;
+zmienna2=10;
+f1 = lambda int x-> int {return x};
+
+f4 = lambda function (int)->(int) f, int x -> int{
+    return (call f  (call f  x))
+};
+
+f5 = lambda function (int)->(int) f, int x -> function (int)->(int) {
+    if (x<0) {
+        return f
+    } else {
+        function (int)->(int) f2;
+        f2 = call self  f  (x-1);
+        return ( lambda int y -> int { return call f2  (call f2  y) } )
+    }
+};
+
 f2 = lambda int x-> void {
-    zmienna2 = zmienna2+1;
-    x = zmienna2;
+    if (x>0) {
+        shout x;
+        x = x-1;
+        call self ref x;
+    } else {
+        shout "i'm done";
+    };
     done
 };
-call f2 ref zmienna1;
-call f2 ref zmienna1;
-call f2 ref zmienna1;
-call f2 ref zmienna1;
-//zmienna1 =1;
-//zmienna2 = call f1 val zmienna1;
+f1 = call f5  f1,  5;
+zmienna1 = 100;
+zmienna1 = call f1  zmienna1;
+shout zmienna1;

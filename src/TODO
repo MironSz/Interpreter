@@ -1,8 +1,9 @@
-1. Sprawdzić funkcje wieloargumentowe
-2. Zrobić TypeChecka
-2.5. Zrobić IdentChecka wraz z TypeCheckiem
-3. Dodać while'a
-4. Dodać shouta, najlepiej przez wyliczanie stringa bo tak najłatwiej, na pohybel wydajności
-6. Propagowanie błędu
-7. Dodać selfa i dowanie selfa do scope'a przed wywołaniem
-5. Sprawdzanie dzielenia przez zero, to jedyny błąd na jaki pozwalamy w trakcie działania programu
+1 . Sprawdzić funkcje wieloargumentowe
+
+2 . Zrobić TypeChecka
+
+2.5 . Zrobić IdentChecka wraz z TypeCheckiem
+
+3 . Dodać while'a
+
+6 . Propagowanie błędu

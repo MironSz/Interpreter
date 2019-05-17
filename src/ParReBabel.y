@@ -70,12 +70,11 @@ import ErrM
   'string' { PT _ (TS _ 30) }
   'this' { PT _ (TS _ 31) }
   'true' { PT _ (TS _ 32) }
-  'val' { PT _ (TS _ 33) }
-  'void' { PT _ (TS _ 34) }
-  'while' { PT _ (TS _ 35) }
-  'xor' { PT _ (TS _ 36) }
-  '{' { PT _ (TS _ 37) }
-  '}' { PT _ (TS _ 38) }
+  'void' { PT _ (TS _ 33) }
+  'while' { PT _ (TS _ 34) }
+  'xor' { PT _ (TS _ 35) }
+  '{' { PT _ (TS _ 36) }
+  '}' { PT _ (TS _ 37) }
 
 L_integ  { PT _ (TI $$) }
 L_ident  { PT _ (TV $$) }
@@ -164,7 +163,7 @@ Item : Expr { AbsReBabel.ItemExpr $1 }
      | 'this' { AbsReBabel.ThisFunctionLambda }
 RefOrVal :: { RefOrVal }
 RefOrVal : 'ref' Ident { AbsReBabel.Ref $2 }
-         | 'val' Item { AbsReBabel.Val $2 }
+         | Item { AbsReBabel.Val $1 }
 ListRefOrVal :: { [RefOrVal] }
 ListRefOrVal : {- empty -} { [] }
              | RefOrVal { (:[]) $1 }

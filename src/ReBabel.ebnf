@@ -1,83 +1,129 @@
-Program. Program ::= [Stmt] ;
-FFalse. FFalse ::= "false" ;
-TTrue. TTrue ::= "true" ;
+Program . Program ::= [Stmt]
 
-Positive. TrueInteger ::= Integer;
-Negative. TrueInteger ::= "-" Integer ;
-TrueCond. RawCondition ::= TTrue ;
-FFalseCond. RawCondition ::= FFalse ;
+FFalse . FFalse ::= "false"
 
-Cond. Condition ::=  "(" RawCondition ")" ;
-BExpr. RawCondition ::= Condition BOperator Condition ;
-Equal. RawCondition ::=  Item "==" Item ;
-Greater. RawCondition ::=  Item ">" Item ;
-Smaller. RawCondition ::=  Item "<" Item ;
-Negate. RawCondition ::= "not" Condition ;
+TTrue . TTrue ::= "true"
 
-DefineOperator. Operator ::= "(" Type ")" Ident "(" Type ")" "=" Lambda ;
-CallOperator. Expr ::= Item Operator Item ;
+Positive . TrueInteger ::= Integer
 
-separator Stmt ";" ;
-Empty. Stmt ::= ";" ;
-Block. Block ::= "{" [Stmt] "}" ;
+Negative . TrueInteger ::= "-" Integer
 
-ReturnBlock. RBlock ::= "{" [Stmt]  RStmt "}" ;
-RBlockStatement. RStmt ::= RBlock;
-BlockStatement. Stmt ::= Block ;
-Decl. Stmt ::= Type Ident ;
-Ass. Stmt ::= Ident "=" Item ;
-IfStmt. Stmt ::= "if" Condition Block "else" Block ;
-WhileStmt. Stmt ::= "while" Condition Block ;
-PrintStatement. Stmt ::= "shout" Item;
-CallStmt. Stmt ::= Call ;
+TrueCond . RawCondition ::= TTrue
 
+FFalseCond . RawCondition ::= FFalse
 
+Cond . Condition ::= "(" RawCondition ")"
 
-Return. RStmt ::= "return" Item ;
-VoidReturn. RStmt ::= "done";
+BExpr . RawCondition ::= Condition BOperator Condition
 
-RIfStmt. RStmt ::= "if" Condition RBlock "else" RBlock ;
+Equal . RawCondition ::= Item "==" Item
 
-VoidT. Type ::= "void" ;
-IntT. Type ::= "int";
-BoolT. Type ::= "bool" ;
-StringT. Type ::= "string";
-FunctionT. Type ::= "function" "(" [Type] ")" "->" "(" Type ")" ;
-separator nonempty Type "," ;
+Greater . RawCondition ::= Item ">" Item
 
-separator nonempty Ident "," ;
-separator nonempty Item "," ;
+Smaller . RawCondition ::= Item "<" Item
 
+Negate . RawCondition ::= "not" Condition
 
-TypeDecl. TypeDecl ::= Type Ident;
-separator nonempty TypeDecl "," ;
-Lambda. Lambda ::= "lambda" [TypeDecl] "->" Type RBlock;
+DefineOperator . Operator ::= "(" Type ")" Ident "(" Type ")" "=" Lambda
 
-ItemExpr. Item ::= Expr ;
-BracesItem. Item ::= "(" Item")";
-ItemIdent. Item ::= Ident ;
-ItemLiteral. Item ::= TrueInteger;
-ItemString. Item ::= String;
-ItemLambda. Item ::= Lambda;
-ThisFunctionLambda. Item ::= "this" ;
+CallOperator . Expr ::= Item Operator Item
 
-Ref. RefOrVal ::= "ref" Ident ;
-Val. RefOrVal ::= "val" Item ;
-separator RefOrVal "," ;
-Call. Call ::="call" Item [RefOrVal] ;
-ECall. Expr ::= Call ;
-MathExpr. Expr ::= Item MathOp Item ;
+separator Stmt ";"
 
-And. BOperator ::= "and";
-Or. BOperator ::= "or";
-Neither. BOperator ::= "neither";
-Xor. BOperator ::= "xor";
+Empty . Stmt ::= ";"
 
-Add. MathOp ::= "+";
-Sub. MathOp ::= "-";
-Mul. MathOp ::= "*";
-Div. MathOp ::= "/";
+Block . Block ::= "{" [Stmt] "}"
 
-comment    "#" ;
-comment    "//" ;
-comment    "/*" "*/" ;
+ReturnBlock . RBlock ::= "{" [Stmt] RStmt "}"
+
+RBlockStatement . RStmt ::= RBlock
+
+BlockStatement . Stmt ::= Block
+
+Decl . Stmt ::= Type Ident
+
+Ass . Stmt ::= Ident "=" Item
+
+IfStmt . Stmt ::= "if" Condition Block "else" Block
+
+WhileStmt . Stmt ::= "while" Condition Block
+
+PrintStatement . Stmt ::= "shout" Item
+
+CallStmt . Stmt ::= Call
+
+Return . RStmt ::= "return" Item
+
+VoidReturn . RStmt ::= "done"
+
+RIfStmt . RStmt ::= "if" Condition RBlock "else" RBlock
+
+VoidT . Type ::= "void"
+
+IntT . Type ::= "int"
+
+BoolT . Type ::= "bool"
+
+StringT . Type ::= "string"
+
+FunctionT . Type ::= "function" "(" [Type] ")" "->" "(" Type ")"
+
+separator nonempty Type ","
+
+separator nonempty Ident ","
+
+separator nonempty Item ","
+
+TypeDecl . TypeDecl ::= Type Ident
+
+separator nonempty TypeDecl ","
+
+Lambda . Lambda ::= "lambda" [TypeDecl] "->" Type RBlock
+
+ItemExpr . Item ::= Expr
+
+BracesItem . Item ::= "(" Item ")"
+
+ItemIdent . Item ::= Ident
+
+ItemLiteral . Item ::= TrueInteger
+
+ItemString . Item ::= String
+
+ItemLambda . Item ::= Lambda
+
+ThisFunctionLambda . Item ::= "this"
+
+Ref . RefOrVal ::= "ref" Ident
+
+Val . RefOrVal ::= Item
+
+separator RefOrVal ","
+
+Call . Call ::= "call" Item [RefOrVal]
+
+ECall . Expr ::= Call
+
+MathExpr . Expr ::= Item MathOp Item
+
+And . BOperator ::= "and"
+
+Or . BOperator ::= "or"
+
+Neither . BOperator ::= "neither"
+
+Xor . BOperator ::= "xor"
+
+Add . MathOp ::= "+"
+
+Sub . MathOp ::= "-"
+
+Mul . MathOp ::= "*"
+
+Div . MathOp ::= "/"
+
+comment "#"
+
+comment "//"
+
+comment "/*" "*/"
