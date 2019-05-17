@@ -115,6 +115,7 @@ returnTypeList (State state) = type_
     Just (ReturnType type_) = Data.Map.lookup returnTypeS state
 
 addReturnType :: State -> Type -> State
+addReturnType s _ = s
 addReturnType (State state) type_ =
   State (insert returnTypeS (ReturnType (type_ : (returnTypeList (State state)))) state)
 
@@ -127,7 +128,12 @@ throwError :: State -> String -> State
 throwError a b = a
 
 emptyState :: State
-emptyState = State (insert storeS (Store [empty]) (insert envS (Env [empty]) (insert minLocS (MinLoc 0) empty)))
+emptyState =
+  State
+    (insert
+       storeS
+       (Store [empty])
+       (insert envS (Env [empty]) (insert minLocS (MinLoc 0) (insert returnTypeS (ReturnType []) empty))))
 
 get :: String -> State -> StateElem
 get s (State state) = fromJust (Data.Map.lookup s state)

@@ -25,7 +25,7 @@ evStatement (CallStmt call) state = state2
     (_, _, state2) = evCallLambda call state
 
 evCondition :: Condition -> State -> (Bool, State)
-evCondition (Cond rawCondition) state = evRawCondition rawCondition state
+evCondition (Cond rawCondition) = evRawCondition rawCondition
 
 evRawCondition :: RawCondition -> State -> (Bool, State)
 evRawCondition (TrueCond _) state          = (True, state)
@@ -75,7 +75,11 @@ evBlock :: Block -> State -> State
 evBlock (Block stmts) state = unnest (foldl evStatementReversed (nest state) stmts)
 
 evRStmt :: RStmt -> State -> (Type, Var, State)
-evRStmt VoidReturn state = (VoidT, Placeholder, checkReturnType state VoidT)
+evRBlock :: RBlock -> State -> (Type, Var, State)
+evRBlock (ReturnBlock stmts rstmt) state = evRStmt rstmt state2
+  where
+    state2 = foldl evStatementReversed state stmts
+
 evRStmt (Return item) state = (type_, var, state2)
   where
     (type_, var, state2) = evItem item state
@@ -84,30 +88,36 @@ evRStmt (RIfStmt condition rblock1 rblock2) state =
    in if isTrue
         then evRStmt (RBlockStatement rblock1) state2
         else evRStmt (RBlockStatement rblock2) state2
-
-evRBlock :: RBlock -> State -> (Type, Var, State)
-evRBlock (ReturnBlock stmts rstmt) state = evRStmt rstmt state2
-  where
-    state2 = foldl evStatementReversed state stmts
+evRStmt VoidReturn state = (VoidT, Placeholder, state)
 
 evDefLambda :: Lambda -> State -> (Type, Var, State)
 evDefLambda (Lambda typeDecls result_type rblock) state =
-  let types = (typesFromTypesDecl typeDecls)
-   in (FunctionT types result_type, FVar (func, state, typeDecls), state)
+  let types = typesFromTypesDecl typeDecls
+   in (FunctionT types result_type, FVar (func, addTypeDeclToEnv state typeDecls, typeDecls), state)
   where
-    func state2 = evRBlock rblock state2
+    func = evRBlock rblock
 
+--  let stateWithDeclared =
 evCallLambda :: Call -> State -> (Type, Var, State)
 evCallLambda (Call item refOrVals) state =
   let (lambdaType, lambda, state2) = evItem item state
    in let lambdaState = loadLambdaVars state2 lambda refOrVals
-       in let lambdaState = addSelf lambdaState lambda
-           in let (resultType, resultVar, newLambdaState) = performLambda lambdaState lambda
-               in let (state, newLambdaState) = retrieveRef state newLambdaState refOrVals
-                   in (resultType, resultVar, newLambdaState)
+       in let lambdaState2 = addSelf lambdaState lambda
+           in let (resultType, resultVar, newLambdaState) = performLambda lambdaState2 lambda
+               in let (state2, newLambdaState2) = retrieveRef state newLambdaState (zip refOrVals (typeDecl lambda))
+                   in (resultType, resultVar, state2)
 
-retrieveRef :: State -> State -> [RefOrVal] -> (State, State)
-retrieveRef s1 s2 _ = (s1, unnest s2)
+typeDecl :: Var -> [TypeDecl]
+typeDecl (FVar (_, _, xs)) = xs
+
+retrieveRef :: State -> State -> [(RefOrVal, TypeDecl)] -> (State, State)
+retrieveRef s1 s2 = foldl retrieveSingleRef (s1, s2) retrieveSingleRef
+
+retrieveSingleRef :: (State, State) -> (RefOrVal, TypeDecl) -> (State, State)
+retrieveSingleRef (globalState, lambdaState) (Ref identInGlobal, TypeDecl _ identInLambda) =
+  let (type_, var, _) = getVarAndType lambdaState identInLambda
+   in (assign globalState identInGlobal type_ var, lambdaState)
+retrieveSingleRef (s1, s2) _ = (s1, s2)
 
 performLambda :: State -> Var -> (Type, Var, State)
 performLambda lambdaState (FVar (func, _, _)) = func lambdaState
@@ -123,11 +133,11 @@ addTypeDeclToEnv state typeDecl = Prelude.foldl addTypeDecl state typeDecl
 --Zwraca state z jakim ma być wywołana lambda
 loadLambdaVars :: State -> Var -> [RefOrVal] -> State
 loadLambdaVars globalState (FVar (func, lambdaState, typeDecl)) refOrVals =
-  let declaredState = addTypeDeclToEnv (nest lambdaState) typeDecl
-   in let identAndRefOrVal = zip typeDecl refOrVals
-       in foldl (addToLambda globalState) declaredState identAndRefOrVal
+  let identAndRefOrVal = zip typeDecl refOrVals
+   in foldl (addToLambda globalState) lambdaState identAndRefOrVal
 
 addToLambda :: State -> State -> (TypeDecl, RefOrVal) -> State
-addToLambda globalState state (TypeDecl type_ ident, Val item) = assign state2 ident type_ val
+addToLambda globalState state (td, Ref ident) = addToLambda globalState state (td, Val (ItemIdent ident))
+addToLambda globalState state (TypeDecl type_ ident, Val item) = assign state ident type_ val
   where
     (type_, val, state2) = evItem item globalState
